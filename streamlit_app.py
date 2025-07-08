@@ -1,18 +1,22 @@
 import streamlit as st
 
+# Page configuration
 st.set_page_config(page_title="Login", page_icon="📖")
 
 st.title("📖 Welcome to Jon Tutor")
 
-# Initialize storage for users in session_state
+# Initialize storage for users and login state
 if 'users' not in st.session_state:
-    st.session_state.users = {}  # Empty dict to store username: password
+    st.session_state.users = {}  # username: password dictionary
 
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 
 if 'username' not in st.session_state:
     st.session_state.username = ""
+
+if 'show_forgot' not in st.session_state:
+    st.session_state.show_forgot = False
 
 # Function to handle login
 def login(username, password):
@@ -26,16 +30,18 @@ def login(username, password):
 # Function to handle account creation
 def create_account(new_user, new_pass, confirm_pass):
     if new_user == "" or new_pass == "":
-        st.warning("Please enter a valid username and password.")
+        st.warning("⚠️ Please enter a valid username and password.")
     elif new_user in st.session_state.users:
-        st.warning("That username is already taken.")
+        st.warning("⚠️ That username is already taken.")
     elif new_pass != confirm_pass:
-        st.warning("Passwords do not match.")
+        st.warning("⚠️ Passwords do not match.")
     else:
         st.session_state.users[new_user] = new_pass
+        with open(USER_FILE, "w") as f:
+            json.dump(st.session_state.users, f)  # Save to file
         st.success("🎉 Account created! You can now log in.")
 
-# Show content based on login state
+# Main content
 if not st.session_state.logged_in:
     tab1, tab2 = st.tabs(["🔐 Login", "📝 Create Account"])
 
@@ -43,14 +49,18 @@ if not st.session_state.logged_in:
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
 
-        col1, col2 = st.columns([1,1])
+        col1, col2 = st.columns([1, 1])
+
         with col1:
             if st.button("Login"):
                 login(username, password)
 
         with col2:
             if st.button("Forgot Password?"):
-                st.info('📧 Please contact **rxu187@gmail.com** to reset your password.')
+                st.session_state.show_forgot = not st.session_state.show_forgot
+
+        if st.session_state.show_forgot:
+            st.info('📧 Please contact **rxu187@gmail.com** to reset your password.')
 
     with tab2:
         new_user = st.text_input("New Username", key="new_user")
@@ -66,3 +76,4 @@ else:
     if st.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = ""
+        st.session_state.show_forgot = False
