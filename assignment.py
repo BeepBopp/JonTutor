@@ -3,8 +3,7 @@ import openai
 import json
 import re
 
-# Initialize OpenAI client
-def initialize_openai():
+def generate_writing_prompt():
     try:
         # Try to get API key from secrets first
         api_key = st.secrets["OPENAI_API_KEY"]
@@ -15,8 +14,7 @@ def initialize_openai():
         st.error("⚠️ OpenAI API key not found in secrets. Please add OPENAI_API_KEY to your Streamlit secrets.")
         st.info("To add secrets, create a `.streamlit/secrets.toml` file in your project root with: `OPENAI_API_KEY = \"your_api_key_here\"`")
         return None
-
-def generate_writing_prompt():
+    
     """Generate a writing prompt appropriate for 6th graders"""
     prompt = """
     Generate a creative and engaging writing prompt appropriate for 6th grade students (ages 11-12). 
