@@ -16,33 +16,76 @@ def initialize_openai():
         st.info("To add secrets, create a `.streamlit/secrets.toml` file in your project root with: `OPENAI_API_KEY = \"your_api_key_here\"`")
         return None
 
+
 def generate_writing_prompt(client):
     """Generate a writing prompt appropriate for 6th graders"""
     
-    # Different prompt categories to ensure variety
-    prompt_types = [
-        "narrative/story",
-        "persuasive/argumentative", 
-        "descriptive/expository",
-        "creative/imaginative",
-        "personal experience/memoir"
+    import random
+    
+    # Weighted prompt categories based on specified percentages
+    prompt_categories = [
+        "creative",  # 20%
+        "creative", 
+        "expository",  # 30%
+        "expository",
+        "expository",
+        "persuasive",  # 20%
+        "persuasive",
+        "personal_narrative",  # 30%
+        "personal_narrative",
+        "personal_narrative"
     ]
     
-    import random
-    prompt_type = random.choice(prompt_types)
+    category = random.choice(prompt_categories)
     
-    prompt = f"""
-    Generate a creative and engaging {prompt_type} writing prompt appropriate for 6th grade students (ages 11-12). 
-    The prompt should:
-    - Be age-appropriate and interesting
-    - Encourage creativity and personal expression
-    - Be clear and easy to understand
-    - Be completely different from typical school prompts
-    - Include specific instructions about what type of essay they should write
-    - Be unique and creative (avoid common topics like "my summer vacation")
+    if category == "creative":
+        prompt = """
+        Generate a creative writing prompt for 6th grade students. The prompt should:
+        - Involve imaginative scenarios (fantasy, sci-fi, adventure, mystery)
+        - Encourage creative storytelling and world-building
+        - Be age-appropriate and engaging
+        - Include specific instructions about creating a fictional narrative
+        
+        Examples: writing from an object's perspective, creating a new world, magical realism, etc.
+        Provide just the prompt text, nothing else.
+        """
     
-    Make it fun and engaging! Provide just the prompt text, nothing else.
-    """
+    elif category == "expository":
+        prompt = """
+        Generate an expository writing prompt for 6th grade students that includes a passage or famous line from literature. The prompt should:
+        - Include a short quote or passage from a well-known book appropriate for middle school
+        - Ask students to analyze, explain, or expand on the quote/passage
+        - Focus on informational or explanatory writing
+        - Be clear about the analytical task
+        
+        Structure: [Quote/Passage] followed by instructions to analyze, explain, or inform about the topic.
+        Provide just the prompt text, nothing else.
+        """
+    
+    elif category == "persuasive":
+        prompt = """
+        Generate a persuasive writing prompt for 6th grade students. The prompt should:
+        - Present a debatable topic relevant to 6th graders
+        - Ask students to take a position and argue for it
+        - Include instructions about using evidence and reasoning
+        - Be age-appropriate (school, community, or age-relevant issues)
+        
+        Examples: school policies, environmental issues, technology use, etc.
+        Provide just the prompt text, nothing else.
+        """
+    
+    else:  # personal_narrative
+        prompt = """
+        Generate a personal narrative writing prompt for 6th grade students. The prompt should:
+        - Ask students to write about their own experiences or memories
+        - Focus on storytelling from their own life
+        - Encourage reflection and personal growth
+        - Be relatable to 6th grade experiences
+        - Include instructions about narrative structure
+        
+        Examples: overcoming challenges, learning moments, relationships, growth experiences, etc.
+        Provide just the prompt text, nothing else.
+        """
     
     try:
         response = client.chat.completions.create(
@@ -55,7 +98,6 @@ def generate_writing_prompt(client):
     except Exception as e:
         st.error(f"Error generating prompt: {str(e)}")
         return None
-
 def grade_essay(client, title, thesis, essay):
     """Grade the essay and provide final comments with strict standards"""
     prompt = f"""
