@@ -3,31 +3,17 @@ import openai
 import json
 import re
 
-# Set page config
-st.set_page_config(
-    page_title="Assignment",
-    page_icon="📝",
-    layout="wide"
-)
-
 # Initialize OpenAI client
 def initialize_openai():
-    if "openai_api_key" not in st.session_state:
-        st.session_state.openai_api_key = ""
-    
-    api_key = st.sidebar.text_input(
-        "Enter your OpenAI API Key:",
-        type="password",
-        value=st.session_state.openai_api_key,
-        help="Get your API key from https://platform.openai.com/"
-    )
-    
-    if api_key:
-        st.session_state.openai_api_key = api_key
+    try:
+        # Try to get API key from secrets first
+        api_key = st.secrets["OPENAI_API_KEY"]
         openai.api_key = api_key
         return True
-    else:
-        st.warning("Please enter your OpenAI API key in the sidebar to continue.")
+    except (KeyError, FileNotFoundError):
+        # Fallback to manual input if secrets not available
+        st.error("⚠️ OpenAI API key not found in secrets. Please add OPENAI_API_KEY to your Streamlit secrets.")
+        st.info("To add secrets, create a `.streamlit/secrets.toml` file in your project root with: `OPENAI_API_KEY = \"your_api_key_here\"`")
         return False
 
 def generate_writing_prompt():
