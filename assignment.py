@@ -125,11 +125,12 @@ def parse_grade_response(response):
     return letter_grade, percentage, comments
 
 def main():
-    st.title("📝 Writing Assignment")
+    st.title("📝 6th Grade Writing Assignment")
     st.markdown("Welcome to your writing assignment! Follow the steps below to complete your essay.")
     
     # Initialize OpenAI
-    if not initialize_openai():
+    client = initialize_openai()
+    if not client:
         st.stop()
     
     # Initialize session state
@@ -153,7 +154,7 @@ def main():
     with col2:
         if st.button("Generate New Prompt", type="primary"):
             with st.spinner("Generating prompt..."):
-                st.session_state.prompt = generate_writing_prompt()
+                st.session_state.prompt = generate_writing_prompt(client)  # Pass client here
                 st.rerun()
     
     if not st.session_state.prompt:
@@ -187,7 +188,7 @@ def main():
     if get_suggestions and title and thesis and essay:
         st.header("Step 3: Revision Suggestions")
         with st.spinner("Analyzing your essay..."):
-            st.session_state.revision_suggestions = get_revision_suggestions(title, thesis, essay)
+            st.session_state.revision_suggestions = get_revision_suggestions(client, title, thesis, essay)  # Pass client here
         
         if st.session_state.revision_suggestions:
             st.success("Here are some suggestions to improve your essay:")
@@ -198,7 +199,7 @@ def main():
     if submit_final and title and thesis and essay:
         st.header("Step 4: Final Grade and Comments")
         with st.spinner("Grading your essay..."):
-            grade_response = grade_essay(title, thesis, essay)
+            grade_response = grade_essay(client, title, thesis, essay)  # Pass client here
             st.session_state.final_grade = grade_response
         
         if st.session_state.final_grade:
