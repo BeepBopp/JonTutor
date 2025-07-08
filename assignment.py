@@ -5,7 +5,7 @@ import re
 
 # Set page config
 st.set_page_config(
-    page_title="6th Grade Writing Assignment",
+    page_title="Assignment",
     page_icon="📝",
     layout="wide"
 )
