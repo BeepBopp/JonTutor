@@ -124,7 +124,7 @@ def parse_grade_response(response):
     return letter_grade, percentage, comments
 
 def main():
-    st.title("📝 6th Grade Writing Assignment")
+    st.title("📝 Writing Assignment")
     st.markdown("Welcome to your writing assignment! Follow the steps below to complete your essay.")
     
     # Initialize OpenAI
