@@ -1,9 +1,10 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 import json
 import re
 
-def generate_writing_prompt():
+# Initialize OpenAI client
+def initialize_openai():
     try:
         # Try to get API key from secrets first
         api_key = st.secrets["OPENAI_API_KEY"]
@@ -14,7 +15,8 @@ def generate_writing_prompt():
         st.error("⚠️ OpenAI API key not found in secrets. Please add OPENAI_API_KEY to your Streamlit secrets.")
         st.info("To add secrets, create a `.streamlit/secrets.toml` file in your project root with: `OPENAI_API_KEY = \"your_api_key_here\"`")
         return None
-    
+
+def generate_writing_prompt(client):
     """Generate a writing prompt appropriate for 6th graders"""
     prompt = """
     Generate a creative and engaging writing prompt appropriate for 6th grade students (ages 11-12). 
@@ -29,7 +31,7 @@ def generate_writing_prompt():
     """
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=200,
@@ -40,7 +42,7 @@ def generate_writing_prompt():
         st.error(f"Error generating prompt: {str(e)}")
         return None
 
-def get_revision_suggestions(title, thesis, essay):
+def get_revision_suggestions(client, title, thesis, essay):
     """Get revision suggestions for the student's essay"""
     prompt = f"""
     You are a helpful 6th grade teacher reviewing a student's essay. Please provide constructive feedback and suggestions for improvement. Be encouraging and supportive while offering specific, actionable advice.
@@ -59,7 +61,7 @@ def get_revision_suggestions(title, thesis, essay):
     """
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=500,
@@ -70,7 +72,7 @@ def get_revision_suggestions(title, thesis, essay):
         st.error(f"Error getting revision suggestions: {str(e)}")
         return None
 
-def grade_essay(title, thesis, essay):
+def grade_essay(client, title, thesis, essay):
     """Grade the essay and provide final comments"""
     prompt = f"""
     You are a 6th grade teacher grading a student's essay. Please evaluate the essay based on 6th grade writing standards and provide a fair, constructive assessment.
@@ -92,7 +94,7 @@ def grade_essay(title, thesis, essay):
     """
     
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=400,
@@ -123,7 +125,7 @@ def parse_grade_response(response):
     return letter_grade, percentage, comments
 
 def main():
-    st.title("📝 Writing Assignment")
+    st.title("📝 6th Grade Writing Assignment")
     st.markdown("Welcome to your writing assignment! Follow the steps below to complete your essay.")
     
     # Initialize OpenAI
