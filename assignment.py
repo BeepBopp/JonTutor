@@ -45,8 +45,7 @@ def generate_writing_prompt(client):
 def get_revision_suggestions(client, title, thesis, essay):
     """Get revision suggestions for the student's essay"""
     prompt = f"""
-    You are a helpful 6th grade teacher reviewing a student's essay. Please provide constructive feedback and suggestions for improvement. Be encouraging and supportive while offering specific, actionable advice. Do not be too much of an easy grader. You are allowed to give Fs / 0s for lacking work.
-
+    You are a helpful 6th grade teacher reviewing a student's essay. Please provide constructive feedback and suggestions for improvement. Be encouraging and supportive while offering specific, actionable advice. You must give Fs or 0s for lacking work.
     Essay Title: {title}
     Thesis Statement: {thesis}
     Essay: {essay}
