@@ -1,8 +1,8 @@
 import streamlit as st
 
-st.set_page_config(page_title="Login", page_icon="🔑")
+st.set_page_config(page_title="Login", page_icon="📖")
 
-st.title("🔑 Welcome to Jon Tutor")
+st.title("📖 Welcome to Jon Tutor")
 
 # Initialize storage for users in session_state
 if 'users' not in st.session_state:
