@@ -18,28 +18,106 @@ def initialize_openai():
 
 def generate_writing_prompt(client):
     """Generate a writing prompt appropriate for 6th graders"""
-    prompt = """
-    Generate a creative and engaging writing prompt appropriate for 6th grade students (ages 11-12). 
+    
+    # Different prompt categories to ensure variety
+    prompt_types = [
+        "narrative/story",
+        "persuasive/argumentative", 
+        "descriptive/expository",
+        "creative/imaginative",
+        "personal experience/memoir"
+    ]
+    
+    import random
+    prompt_type = random.choice(prompt_types)
+    
+    prompt = f"""
+    Generate a creative and engaging {prompt_type} writing prompt appropriate for 6th grade students (ages 11-12). 
     The prompt should:
     - Be age-appropriate and interesting
     - Encourage creativity and personal expression
     - Be clear and easy to understand
-    - Allow for different types of responses (narrative, descriptive, persuasive, etc.)
-    - Include a brief instruction about what type of essay they should write
+    - Be completely different from typical school prompts
+    - Include specific instructions about what type of essay they should write
+    - Be unique and creative (avoid common topics like "my summer vacation")
     
-    Provide just the prompt text, nothing else.
+    Make it fun and engaging! Provide just the prompt text, nothing else.
     """
     
     try:
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=200,
-            temperature=0.8
+            max_tokens=250,
+            temperature=1.0  # Higher temperature for more variety
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
         st.error(f"Error generating prompt: {str(e)}")
+        return None
+
+def grade_essay(client, title, thesis, essay):
+    """Grade the essay and provide final comments with strict standards"""
+    prompt = f"""
+    You are a strict 6th grade teacher grading a student's essay. Be very critical and realistic in your assessment. This is NOT participation trophy grading - students need to earn their grades.
+
+    Essay Title: {title}
+    Thesis Statement: {thesis}
+    Essay: {essay}
+
+    GRADING SCALE (be very strict):
+    93+: A
+    90-92: A-
+    87-89: B+
+    83-86: B
+    80-82: B-
+    77-79: C+
+    73-76: C
+    70-72: C-
+    67-69: D+
+    63-66: D
+    60-62: D-
+    <59: F
+
+    GRADING CRITERIA (be very strict):
+    - If the essay is clearly minimal effort, nonsensical, or just random letters/words: Give F (<59%)
+    - If the essay lacks a clear thesis or main idea: Maximum D range (60-66%)
+    - If the essay is very short, poorly organized, or off-topic: Maximum D+ range (67-69%)
+    - If the essay shows some effort but has major issues: C range (70-79%)
+    - If the essay is well-written with minor issues: B range (80-89%)
+    - If the essay is excellent with strong ideas and organization: A range (90-100%)
+
+    AUTOMATIC F TRIGGERS:
+    - Random letters or nonsensical text
+    - Extremely short responses (less than 50 words)
+    - Completely off-topic
+    - No clear attempt at the assignment
+    - Obvious lack of effort
+
+    Evaluate based on:
+    - Content and ideas (25%) - Are there actual ideas present?
+    - Organization and structure (25%) - Is there a clear beginning, middle, end?
+    - Voice and word choice (25%) - Is this actual writing or just random text?
+    - Grammar and mechanics (25%) - Are there complete sentences?
+
+    BE REALISTIC. If a student clearly didn't try, give them an F. Don't be overly generous.
+
+    Provide your response in this exact format:
+    GRADE: [Letter grade A-F]
+    PERCENTAGE: [Number from 0-100]
+    COMMENTS: [2-3 paragraphs of specific feedback explaining the grade. Be honest about the quality.]
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=500,
+            temperature=0.3  # Lower temperature for more consistent grading
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        st.error(f"Error grading essay: {str(e)}")
         return None
 
 def get_revision_suggestions(client, title, thesis, essay):
@@ -69,39 +147,6 @@ def get_revision_suggestions(client, title, thesis, essay):
         return response.choices[0].message.content.strip()
     except Exception as e:
         st.error(f"Error getting revision suggestions: {str(e)}")
-        return None
-
-def grade_essay(client, title, thesis, essay):
-    """Grade the essay and provide final comments"""
-    prompt = f"""
-    You are a 6th grade teacher grading a student's essay. Please evaluate the essay based on 6th grade writing standards and provide a fair, constructive assessment.
-
-    Essay Title: {title}
-    Thesis Statement: {thesis}
-    Essay: {essay}
-
-    Please evaluate based on:
-    - Content and ideas (25%)
-    - Organization and structure (25%)
-    - Voice and word choice (25%)
-    - Grammar and mechanics (25%)
-
-    Provide your response in this exact format:
-    GRADE: [Letter grade A-F]
-    PERCENTAGE: [Number from 0-100]
-    COMMENTS: [2-3 paragraphs of specific, encouraging feedback explaining the grade and highlighting both strengths and areas for growth]
-    """
-    
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=400,
-            temperature=0.5
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        st.error(f"Error grading essay: {str(e)}")
         return None
 
 def parse_grade_response(response):
