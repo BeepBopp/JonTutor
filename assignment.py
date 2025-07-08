@@ -8,7 +8,13 @@ def initialize_openai():
     try:
         # Try to get API key from secrets first
         api_key = st.secrets["OPENAI_API_KEY"]
-        return True
+        client = OpenAI(api_key=api_key)
+        return client
+    except (KeyError, FileNotFoundError):
+        # Fallback to manual input if secrets not available
+        st.error("⚠️ OpenAI API key not found in secrets. Please add OPENAI_API_KEY to your Streamlit secrets.")
+        st.info("To add secrets, create a `.streamlit/secrets.toml` file in your project root with: `OPENAI_API_KEY = \"your_api_key_here\"`")
+        return None
 
 def generate_writing_prompt():
     """Generate a writing prompt appropriate for 6th graders"""
