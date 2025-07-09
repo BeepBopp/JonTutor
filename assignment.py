@@ -49,7 +49,8 @@ SENDER_PASSWORD = "your-app-password"
             "kgun1329@gmail.com",
             "rxu187@gmail.com", 
             "wuxiaopei84@gmail.com",
-            "jxu14s@k12.jh.
+            "jxu14s@k12.jh.edu",
+        ]
 
 def generate_writing_prompt(client):
     """Generate a writing prompt appropriate for 6th graders"""
