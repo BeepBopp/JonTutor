@@ -49,8 +49,7 @@ SENDER_PASSWORD = "your-app-password"
             "kgun1329@gmail.com",
             "rxu187@gmail.com", 
             "wuxiaopei84@gmail.com",
-            "jxu14s@k12.jh.edu"
-        ]
+            "jxu14s@k12.jh.
 
 def generate_writing_prompt(client):
     """Generate a writing prompt appropriate for 6th graders"""
@@ -135,79 +134,78 @@ def generate_writing_prompt(client):
         return None
 
 def grade_essay(client, title, thesis, essay):
-    """Grade the essay and provide final comments with strict standards"""
+    """Grade the essay and provide final comments with the given standards"""
     
-    # Count words for initial assessment
+    # Count words to help with grading
     word_count = len(essay.split())
     
     prompt = f"""
-    You are a 6th grade teacher grading a student's essay. Analyze this essay carefully and give a realistic grade based on actual quality. DO NOT default to the same grade every time.
+    You are a 6th grade teacher grading a student's essay. You must vary your grades based on actual quality - DO NOT default to the same grade every time. Analyze the content carefully and give appropriate grades.
 
     Essay Title: {title}
     Thesis Statement: {thesis}
     Essay: {essay}
     Word Count: {word_count}
 
-    GRADING SCALE:
-    93-100: A (Exceptional work - clear thesis, excellent organization, strong ideas, good mechanics)
-    90-92: A- (Very good work with minor issues)
-    87-89: B+ (Good work with some problems)
-    83-86: B (Satisfactory work, meets requirements)
-    80-82: B- (Adequate work with notable issues)
+    GRADING SCALE (use the FULL range):
+    93-100: A (Exceptional work, clear thesis, excellent organization, engaging writing)
+    90-92: A- (Very good work with minor areas for improvement)
+    87-89: B+ (Good work, mostly well-organized, some strong ideas)
+    83-86: B (Solid work, meets expectations, some issues)
+    80-82: B- (Adequate work, meets basic requirements)
     77-79: C+ (Below average, some effort shown)
-    73-76: C (Poor work, minimal effort)
-    70-72: C- (Very poor work)
-    67-69: D+ (Barely passing, major problems)
-    63-66: D (Failing quality but some attempt made)
-    60-62: D- (Very poor attempt)
+    73-76: C (Poor organization or weak ideas)
+    70-72: C- (Minimal effort, basic requirements barely met)
+    67-69: D+ (Very poor quality, major issues)
+    63-66: D (Extremely poor, lacks basic requirements)
+    60-62: D- (Almost no effort, serious problems)
     0-59: F (No effort, nonsensical, or extremely short)
 
-    SPECIFIC GRADING CRITERIA:
+    GRADING CRITERIA - BE SPECIFIC:
     
-    AUTOMATIC F (0-59%) - Give this if ANY of these apply:
-    - Less than 30 words total
-    - Random letters or gibberish
+    AUTOMATIC F (0-59%):
+    - Less than 50 words
+    - Nonsensical text or random letters
     - Completely off-topic
-    - No clear sentences
+    - No clear attempt
 
-    D RANGE (60-69%) - Give this if:
-    - Very short (30-75 words)
+    D RANGE (60-69%):
+    - 50-100 words but very poor quality
     - No clear thesis or main idea
     - Extremely poor organization
-    - Many grammar/spelling errors
+    - Major grammar/spelling issues throughout
 
-    C RANGE (70-79%) - Give this if:
-    - Short but coherent (75-150 words)
+    C RANGE (70-79%):
+    - 100-200 words, shows some effort
     - Weak thesis or unclear main idea
-    - Some organization but poor transitions
-    - Multiple errors but readable
+    - Poor organization but some structure
+    - Multiple grammar/spelling errors
 
-    B RANGE (80-89%) - Give this if:
-    - Good length (150-250 words)
-    - Clear thesis and main ideas
-    - Generally well organized
-    - Some minor errors
+    B RANGE (80-89%):
+    - 200+ words, good effort
+    - Clear thesis, mostly good organization
+    - Some strong ideas with minor issues
+    - Few grammar/spelling errors
 
-    A RANGE (90-100%) - Give this if:
-    - Excellent length and depth (250+ words)
+    A RANGE (90-100%):
+    - 250+ words, exceptional effort
     - Strong, clear thesis
     - Excellent organization and flow
-    - Creative ideas and strong voice
-    - Few or no errors
+    - Engaging writing, minimal errors
 
-    IMPORTANT: Look at the ACTUAL QUALITY of this specific essay. Don't give the same grade to every essay. If it's truly excellent, give an A. If it's truly poor, give a D or F. Be honest about what you're reading.
+    IMPORTANT: Look at the actual content quality. If it's truly excellent, give an A. If it's truly poor, give a D or F. Don't default to B- every time!
 
     Provide your response in this exact format:
-    GRADE: [Letter grade A-F]
-    PERCENTAGE: [Number from 0-100]
-    COMMENTS: [2-3 paragraphs of specific feedback explaining the grade. Be honest about the quality.]
+    GRADE: [Letter grade A-F with +/- if applicable]
+    PERCENTAGE: [Specific number from 0-100]
+    COMMENTS: [2-3 paragraphs explaining why you gave this specific grade, referencing actual content from the essay]
     """
     
     try:
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=500,
+            max_tokens=600,
             temperature=0.7  # Higher temperature for more varied grading
         )
         return response.choices[0].message.content.strip()
