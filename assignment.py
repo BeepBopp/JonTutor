@@ -134,7 +134,7 @@ def generate_writing_prompt(client):
         return None
 
 def grade_essay(client, title, thesis, essay):
-    """Grade the essay and provide final comments with strict standards"""
+    """Grade the essay and provide final comments with the given standards"""
     
     # Count words for initial assessment
     word_count = len(essay.split())
